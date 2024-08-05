@@ -1,12 +1,12 @@
-import {Chain, ChainClient, ChainOptions, defaultChainOptions, RandomnessBeacon} from './index';
-import { defaultHttpOptions, HttpOptions, jsonOrError } from './util';
+import {Chain, ChainClient, ChainOptions, defaultChainOptions, RandomnessBeacon} from './index'
+import {defaultHttpOptions, HttpOptions, jsonOrError} from './util'
 
 class HttpChainClient implements ChainClient {
 
     constructor(
         private someChain: Chain,
         public options: ChainOptions = defaultChainOptions,
-        public httpOptions: HttpOptions = defaultHttpOptions) {    
+        public httpOptions: HttpOptions = defaultHttpOptions) {
     }
 
     async get(roundNumber: number): Promise<RandomnessBeacon> {
