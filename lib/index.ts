@@ -1,6 +1,7 @@
 import HttpCachingChain from './http-caching-chain'
 import {HttpChain} from './http-caching-chain'
 import HttpChainClient from './http-chain-client'
+import {HttpCachingChainClient} from './http-chain-client'
 import FastestNodeClient from './fastest-node-client'
 import MultiBeaconNode from './multi-beacon-node'
 import {retryOnError, roundAt, roundTime, sleep} from './util'
@@ -219,6 +220,7 @@ export {
     HttpChain,
     HttpChainClient,
     HttpCachingChain,
+    HttpCachingChainClient,
     MultiBeaconNode,
     FastestNodeClient,
     roundAt,
