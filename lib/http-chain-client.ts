@@ -1,93 +1,77 @@
-import {
-  Chain,
-  ChainClient,
-  ChainOptions,
-  defaultChainOptions,
-  RandomnessBeacon,
-} from "./index";
-import { defaultHttpOptions, HttpOptions, jsonOrError } from "./util";
+import {Chain, ChainClient, ChainOptions, defaultChainOptions, RandomnessBeacon} from './index';
+import { defaultHttpOptions, HttpOptions, jsonOrError } from './util';
 
 class HttpChainClient implements ChainClient {
-  constructor(
-    private someChain: Chain,
-    public options: ChainOptions = defaultChainOptions,
-    public httpOptions: HttpOptions = defaultHttpOptions
-  ) {}
 
-  async get(roundNumber: number): Promise<RandomnessBeacon> {
-    const url = withCachingParams(
-      `${this.someChain.baseUrl}/public/${roundNumber}`,
-      this.options
-    );
-    return await jsonOrError(url, this.httpOptions);
-  }
+    constructor(
+        private someChain: Chain,
+        public options: ChainOptions = defaultChainOptions,
+        public httpOptions: HttpOptions = defaultHttpOptions) {    
+    }
 
-  async latest(): Promise<RandomnessBeacon> {
-    const url = withCachingParams(
-      `${this.someChain.baseUrl}/public/latest`,
-      this.options
-    );
-    return await jsonOrError(url, this.httpOptions);
-  }
+    async get(roundNumber: number): Promise<RandomnessBeacon> {
+        const url = withCachingParams(`${this.someChain.baseUrl}/public/${roundNumber}`, this.options)
+        return await jsonOrError(url, this.httpOptions)
+    }
 
-  chain(): Chain {
-    return this.someChain;
-  }
+    async latest(): Promise<RandomnessBeacon> {
+        const url = withCachingParams(`${this.someChain.baseUrl}/public/latest`, this.options)
+        return await jsonOrError(url, this.httpOptions)
+    }
+
+    chain(): Chain {
+        return this.someChain;
+    }
 }
 
 class HttpCachingChainClient implements ChainClient {
-  private beaconCache: Map<number, RandomnessBeacon> = new Map();
+    
+    private beaconCache: Map<number, RandomnessBeacon> = new Map()
 
-  constructor(
-    private someChain: Chain,
-    public options: ChainOptions = defaultChainOptions,
-    public httpOptions: HttpOptions = defaultHttpOptions
-  ) {}
-
-  async get(roundNumber: number): Promise<RandomnessBeacon> {
-    const cachedBeacon = this.beaconCache.get(roundNumber);
-    if (cachedBeacon) {
-      return cachedBeacon;
+    constructor(
+        private someChain: Chain,
+        public options: ChainOptions = defaultChainOptions,
+        public httpOptions: HttpOptions = defaultHttpOptions) {
     }
 
-    const url = withCachingParams(
-      `${this.someChain.baseUrl}/public/${roundNumber}`,
-      this.options
-    );
-    const beacon = await jsonOrError(url, this.httpOptions);
+    async get(roundNumber: number): Promise<RandomnessBeacon> {
+        const cachedBeacon = this.beaconCache.get(roundNumber)
+        if (cachedBeacon) {
+            return cachedBeacon
+        }
 
-    this.beaconCache.set(roundNumber, beacon);
+        const url = withCachingParams(`${this.someChain.baseUrl}/public/${roundNumber}`,this.options)
+        const beacon = await jsonOrError(url, this.httpOptions)
 
-    return beacon;
-  }
+        this.beaconCache.set(roundNumber, beacon)
 
-  async latest(): Promise<RandomnessBeacon> {
-    const url = withCachingParams(
-      `${this.someChain.baseUrl}/public/latest`,
-      this.options
-    );
-    const beacon = await jsonOrError(url, this.httpOptions);
+        return beacon
+    }
 
-    this.beaconCache.set(beacon.round, beacon);
+    async latest(): Promise<RandomnessBeacon> {
+        const url = withCachingParams(`${this.someChain.baseUrl}/public/latest`,this.options)
+        const beacon = await jsonOrError(url, this.httpOptions)
 
-    return beacon;
-  }
+        this.beaconCache.set(beacon.round, beacon)
 
-  chain(): Chain {
-    return this.someChain;
-  }
+        return beacon
+    }
 
-  clearBeaconCache(): void {
-    this.beaconCache.clear();
-  }
+    chain(): Chain {
+        return this.someChain
+    }
+
+    clearBeaconCache(): void {
+        this.beaconCache.clear()
+    }
 }
 
 function withCachingParams(url: string, config: ChainOptions): string {
-  if (config.noCache) {
-    return `${url}?${Date.now()}`;
-  }
-  return url;
+    if (config.noCache) {
+        return `${url}?${Date.now()}`
+    }
+    return url
 }
 
-export { HttpCachingChainClient };
-export default HttpChainClient;
+export {HttpCachingChainClient}
+export default HttpChainClient
